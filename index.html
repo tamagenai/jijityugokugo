@@ -5,10 +5,10 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>時事中国語クイズ</title>
+  <title>中国語クイズ</title>
   <style>
     * {
-      font-size: 18px;
+      font-size: 20px;
     }
 
     .header {
@@ -26,7 +26,9 @@
       padding-left: 100px;
 
     }
-
+    .question-no {
+      font-size: 16px;
+    }
 
 
     .clkBtn {
@@ -48,7 +50,7 @@
     }
 
     .dataContent {
-      padding-top: 120px;
+      padding-top: 80px;
 
       display: block;
     }
@@ -117,6 +119,10 @@
     #comment {
       font-size: 32px;
     }
+    #baiFen {
+      font-size: 32px;
+      color: red;
+    }
 
     #check-next {
       background-color: cyan;
@@ -150,7 +156,12 @@
       margin-bottom: 20px;
       cursor: pointer;
       user-select: none;
+      box-shadow: 0 4px #7a0000;
 
+    }
+    .divSpeak:active {
+      box-shadow: 0 1px #7a0000;
+      transform: translateY(3px);
     }
 
     .totalGrade {
@@ -280,6 +291,14 @@
 
   <!-- <script src="./get_post_gss.js"></script> -->
   <script>
+    // スプレッドシート　列　定数定義
+    const idxNo = 0;
+    const idxPattern = 1;
+    const idxHanyu = 2;
+    const idxPinyin = 3;
+    const idxRiyu = 4;
+    const idxSpan = 5;
+    //
     let cssIndex = 0;
 
     let swButton = false;  // false: check  true: next
@@ -289,6 +308,7 @@
     let checknext;
     let comment;
     let seikaiSu;    // シートごとの正解数
+    
     main = document.getElementById('main');
     container = document.getElementById('container');
     // document.addEventListener('DOMContentLoaded', function () {
@@ -310,13 +330,13 @@
     }
     function speakDataX(param1, param2) {
 
-      const quizPattern = questions[cssIndex][0];
+      const quizPattern = questions[cssIndex][idxPattern];
       const td = param1;
       let answerGroup = document.querySelectorAll('.answer');;
       let questionGroup = document.querySelectorAll('.question');;
       let answerSpans = answerGroup[cssIndex];
       let questionSpans = questionGroup[cssIndex];
-      let sheetDatas;
+      // let sheetDatas;
       if (quizPattern !== 'E') {
         var uttr = new SpeechSynthesisUtterance(td.textContent);
         uttr.lang = "zh-CN"
@@ -342,7 +362,7 @@
     function speakData2() {
       let l = 1;
       // if (param1 instanceof HTMLTableCellElement) {
-      const hanyuWords = questions[cssIndex][1];
+      const hanyuWords = questions[cssIndex][idxHanyu];
       var uttr = new SpeechSynthesisUtterance(hanyuWords);
       uttr.lang = "zh-CN"
       uttr.rate = speakSpeedRate();
@@ -445,20 +465,28 @@
     function renderQuestions(questions) {
       questions.forEach((question) => {
         question_Shuffle(question);
-        if (question[0] === 'A') {
-          renderA_Question(question);
-        } else if (question[0] === 'B') {
-          renderB_Question(question);
-        } else if (question[0] === 'C') {
-          renderC_Question(question);
+        if (question[idxPattern] === 'A') {
+          renderX_Question(question);
+        } else if (question[idxPattern] === 'B') {
+          renderX_Question(question);
+        } else if (question[idxPattern] === 'C') {
+          renderX_Question(question);
+          
 
 
-        } else if (question[0] === 'D') {
-          renderD_Question(question);
+        } else if (question[idxPattern] === 'D') {
+          renderX_Question(question);
 
+        } else if (question[idxPattern] === 'E') {
+          renderX_Question(question);
 
-        } else if (question[0] === 'E') {
-          renderE_Question(question);
+        
+        } else if (question[idxPattern] === 'F') {
+          renderX_Question(question);
+
+        
+        } else if (question[idxPattern] === 'G') {
+          renderX_Question(question);
 
         }
 
@@ -509,14 +537,14 @@
       let inTab = [];
       let outTab = [];
       for (i = 0; i < question.length; i++) {
-        if (question[4 + i] == '') {
+        if (question[idxSpan + i] == '') {
           break;
         }
-        inTab[i] = question[4 + i];
+        inTab[i] = question[idxSpan + i];
       }
       outTab = shuffleArray(inTab);
       for (i = 0; i < outTab.length; i++) {
-        question[4 + i] = outTab[i];
+        question[idxSpan + i] = outTab[i];
       }
       
 
@@ -526,7 +554,10 @@
 
 
 
-    function renderA_Question(question) {
+    
+    
+    // 
+    function renderX_Question(question) {
       // const container = document.getElementById('main');
       container = document.getElementById('container');
       let div, p, span, divContent;
@@ -534,304 +565,128 @@
       divContent.setAttribute('class', 'dataContent');
       container.appendChild(divContent);
       //
-      div = document.createElement('div');
+      p = document.createElement('p');
+      p.textContent = `問題番号：${question[idxNo]}/${questions.length - 1}`;
+      p.setAttribute('class', 'question-no');
+      divContent.appendChild(p);
 
-      div.setAttribute('class', 'input inputNodisplay');
-      divContent.appendChild(div);
       //
+      
       p = document.createElement('p');
-      p.textContent = question[2];
-      p.setAttribute('class', 'pinyin pinyinNoDisplay');
+      p.textContent = question[idxPinyin];
+      if (question[idxPattern] === 'D') {
+        p.setAttribute('class', 'pinyin');
+
+      } else {
+        p.setAttribute('class', 'pinyin pinyinNoDisplay');
+
+      }
       divContent.appendChild(p);
       //
       p = document.createElement('p');
-      p.textContent = question[1];
-      p.setAttribute('class', 'hanyu hanyuNoDisplay');
-      p.setAttribute('onclick', 'speakData(this)');
-      divContent.appendChild(p);
+      p.textContent = question[idxHanyu];
+      if (question[idxPattern] === 'E') {
+
+        p.setAttribute('class', 'hanyu');
+        p.setAttribute('onclick', 'speakData(this)');
+        divContent.appendChild(p);
+
+      } else {
+        p.setAttribute('class', 'hanyu hanyuNoDisplay');
+        p.setAttribute('onclick', 'speakData(this)');
+        divContent.appendChild(p);
+
+      }
       //
       p = document.createElement('p');
-      p.textContent = question[3];
-      p.setAttribute('class', 'japanese');
-      divContent.appendChild(p);
+      p.textContent = question[idxRiyu];
+      if (question[idxPattern] === 'A' || question[idxPattern] === 'F') {
+        p.setAttribute('class', 'japanese');
+        divContent.appendChild(p);
+
+      } else {
+        p.setAttribute('class', 'japanese japaneseNoDisplay');
+        divContent.appendChild(p);
+
+      }
+      //
+      if (question[idxPattern] === 'C') {
+        p = document.createElement('p');
+        p.textContent = 'ピンインを漢字に直して並べ替え正しい文章にしてください。';
+        divContent.appendChild(p);
+
+      }
+
+      //
+      if (question[idxPattern] === 'B' || question[idxPattern] === 'G') {
+        divSpeak = document.createElement('div');
+        divSpeak.textContent = 'Speak';
+        divSpeak.setAttribute('onclick', 'speakData2()');
+        divSpeak.setAttribute('class', 'divSpeak');
+        divContent.appendChild(divSpeak);
+      }
       // 
       div = document.createElement('div');
       div.setAttribute('class', 'answer member connectedSortable');
       divContent.appendChild(div);
       span = document.createElement('span');
-      span.textContent = '回答：　';
+      if (question[idxPattern] === 'C' ||question[idxPattern] === 'F' || question[idxPattern] === 'G') {
+        span.textContent = '';
+
+      } else {
+        span.textContent = '回答：　';
+
+      }
       div.appendChild(span);
       // 
       div = document.createElement('div');
       div.setAttribute('class', 'question member connectedSortable');
       divContent.appendChild(div);
       span = document.createElement('span');
-      span.textContent = '問題：　';
-      div.appendChild(span);
-      let i;
-      for (i = 4; i < question.length; i++) {
-        if (question[i] !== '') {
-          span = document.createElement('span');
-          span.textContent = question[i];
-          span.setAttribute('onclick', 'speakDataX(this)')
-          // span.setAttribute('onmousedown', 'speakData(this)')
-          div.appendChild(span);
-
-        }
-
-      }
-
-
-    }
-    function renderB_Question(question) {
-      // const container = document.getElementById('container');
-      container = document.getElementById('container');
-      let div, p, span, divContent, button;
-      divContent = document.createElement('dir');
-      divContent.setAttribute('class', 'dataContent');
-      container.appendChild(divContent);
-      //
-      //
-      div = document.createElement('div');
-
-      div.setAttribute('class', 'input inputNodisplay');
-      divContent.appendChild(div);
-      //
-      p = document.createElement('p');
-      p.textContent = question[2];
-      p.setAttribute('class', 'pinyin pinyinNoDisplay');
-
-      divContent.appendChild(p);
-      //
-      p = document.createElement('p');
-      p.textContent = question[1];
-      p.setAttribute('class', 'hanyu hanyuNoDisplay');
-      p.setAttribute('onclick', 'speakData(this)');
-      divContent.appendChild(p);
-      //
-      p = document.createElement('p');
-      p.textContent = question[3];
-      p.setAttribute('class', 'japanese japaneseNoDisplay');
-      divContent.appendChild(p);
-      //
-      divSpeak = document.createElement('div');
-      divSpeak.textContent = 'Speak';
-      divSpeak.setAttribute('onclick', 'speakData2()');
-      divSpeak.setAttribute('class', 'divSpeak');
-      divContent.appendChild(divSpeak);
-      //
-      div = document.createElement('div');
-      div.setAttribute('class', 'answer member connectedSortable');
-      divContent.appendChild(div);
-      span = document.createElement('span');
-      span.textContent = '回答：　';
-      div.appendChild(span);
-      // 
-      div = document.createElement('div');
-      div.setAttribute('class', 'question member connectedSortable');
-      divContent.appendChild(div);
-      span = document.createElement('span');
-      span.textContent = '問題：　';
-      div.appendChild(span);
-      let i;
-      for (i = 4; i < question.length; i++) {
-        if (question[i] !== '') {
-          span = document.createElement('span');
-          span.textContent = question[i];
-          span.setAttribute('onclick', 'speakDataX(this)')
-          // span.setAttribute('onmousedown', 'speakData(this)')
-          div.appendChild(span);
-
-        }
-
-      }
-
-    }
-    // 
-    function renderC_Question(question) {
-      // const container = document.getElementById('container');
-      container = document.getElementById('container');
-      let div, p, span, divContent, input;
-      divContent = document.createElement('dir');
-      divContent.setAttribute('class', 'dataContent');
-      container.appendChild(divContent);
-      //
-
-      p = document.createElement('p');
-      p.textContent = question[2];
-      p.setAttribute('class', 'pinyin pinyinNoDisplay');
-      divContent.appendChild(p);
-      //
-      p = document.createElement('p');
-      p.textContent = question[1];
-      p.setAttribute('class', 'hanyu hanyuNoDisplay');
-      p.setAttribute('onclick', 'speakData(this)');
-      divContent.appendChild(p);
-      //
-      //
-      p = document.createElement('p');
-      p.textContent = question[3];
-      p.setAttribute('class', 'japanese japaneseNoDisplay');
-
-      divContent.appendChild(p);
-      //
-      p = document.createElement('p');
-      p.textContent = 'ピンインを漢字に直して並べ替え正しい文章にしてください。';
-
-      divContent.appendChild(p);
-
-      // 
-      // 
-      div = document.createElement('div');
-      div.setAttribute('class', 'answer member connectedSortable');
-      divContent.appendChild(div);
-      span = document.createElement('span');
-      span.textContent = '';
-      div.appendChild(span);
-      //
-      div = document.createElement('div');
-      div.setAttribute('class', 'question member connectedSortable');
-      divContent.appendChild(div);
-      span = document.createElement('span');
-      span.textContent = '問題：　';
-      div.appendChild(span);
-      let i;
-      for (i = 4; i < question.length; i++) {
-        if (question[i] !== '') {
-          span = document.createElement('span');
-          span.textContent = question[i];
-
-          div.appendChild(span);
-
+      if (question[idxPattern] === 'F' || question[idxPattern] === 'G') {
+        
+        span.textContent = '';
+      } else {
+        span.textContent = '問題：　';
+        div.appendChild(span);
+        let i;
+        for (i = idxSpan; i < question.length; i++) {
+          if (question[i] !== '') {
+            span = document.createElement('span');
+            span.textContent = question[i];
+            span.setAttribute('onclick', 'speakDataX(this)')
+            // span.setAttribute('onmousedown', 'speakData(this)')
+            div.appendChild(span);
+  
+          }
+  
         }
 
       }
       // 
-      div = document.createElement('div');
-      div.textContent = '中国語入力';
-      divContent.appendChild(div);
-      input = document.createElement('input');
+      if (question[idxPattern] === 'C' || question[idxPattern] === 'F' || question[idxPattern] === 'G') {
+        div = document.createElement('div');
+        div.textContent = '中国語入力';
+        divContent.appendChild(div);
+        input = document.createElement('input');
 
-      input.setAttribute('class', 'input');
-      input.setAttribute('maxlength', '40');
-      input.setAttribute('size', '40');
-      div.appendChild(input);
+        input.setAttribute('class', 'input');
+        input.setAttribute('maxlength', '40');
+        input.setAttribute('size', '40');
+        div.appendChild(input);
 
-    }
-    function renderD_Question(question) {
-      // const container = document.getElementById('container');
-      container = document.getElementById('container');
-      let div, p, span, divContent;
-      divContent = document.createElement('dir');
-      divContent.setAttribute('class', 'dataContent');
-      container.appendChild(divContent);
-      //
-      div = document.createElement('div');
+      } else {
+        //
+        div = document.createElement('div');
 
-      div.setAttribute('class', 'input inputNodisplay');
-      divContent.appendChild(div);
-      //
-      p = document.createElement('p');
-      p.textContent = question[2];
-      p.setAttribute('class', 'pinyin');
-      divContent.appendChild(p);
-      //
-      p = document.createElement('p');
-      p.textContent = question[1];
-      p.setAttribute('class', 'hanyu hanyuNoDisplay');
-      p.setAttribute('onclick', 'speakData(this)');
-      divContent.appendChild(p);
-      //
-      p = document.createElement('p');
-      p.textContent = question[3];
-      p.setAttribute('class', 'japanese japaneseNoDisplay');
-      divContent.appendChild(p);
-      // 
-      div = document.createElement('div');
-      div.setAttribute('class', 'answer member connectedSortable');
-      divContent.appendChild(div);
-      span = document.createElement('span');
-      span.textContent = '回答：　';
-      div.appendChild(span);
-      // 
-      div = document.createElement('div');
-      div.setAttribute('class', 'question member connectedSortable');
-      divContent.appendChild(div);
-      span = document.createElement('span');
-      span.textContent = '問題：　';
-      div.appendChild(span);
-      let i;
-      for (i = 4; i < question.length; i++) {
-        if (question[i] !== '') {
-          span = document.createElement('span');
-          span.textContent = question[i];
-          span.setAttribute('onclick', 'speakDataX(this)')
-          // span.setAttribute('onmousedown', 'speakData(this)')
-          div.appendChild(span);
-
-        }
-
+        div.setAttribute('class', 'input inputNodisplay');
+        divContent.appendChild(div);
       }
 
 
     }
-    function renderE_Question(question) {
-      // const container = document.getElementById('container');
-      container = document.getElementById('container');
-      let div, p, span, divContent;
-      divContent = document.createElement('dir');
-      divContent.setAttribute('class', 'dataContent');
-      container.appendChild(divContent);
-      //
-      div = document.createElement('div');
-
-      div.setAttribute('class', 'input inputNodisplay');
-      divContent.appendChild(div);
-      //
-      p = document.createElement('p');
-      p.textContent = question[2];
-      p.setAttribute('class', 'pinyin pinyinNoDisplay');
-      divContent.appendChild(p);
-      //
-      p = document.createElement('p');
-      p.textContent = question[1];
-      p.setAttribute('class', 'hanyu');
-      p.setAttribute('onclick', 'speakData(this)');
-      divContent.appendChild(p);
-      //
-      p = document.createElement('p');
-      p.textContent = question[3];
-      p.setAttribute('class', 'japanese japaneseNoDisplay');
-      divContent.appendChild(p);
-      // 
-      div = document.createElement('div');
-      div.setAttribute('class', 'answer member connectedSortable');
-      divContent.appendChild(div);
-      span = document.createElement('span');
-      span.textContent = '回答：　';
-      div.appendChild(span);
-      // 
-      div = document.createElement('div');
-      div.setAttribute('class', 'question member connectedSortable');
-      divContent.appendChild(div);
-      span = document.createElement('span');
-      span.textContent = '問題：　';
-      div.appendChild(span);
-      let i;
-      for (i = 4; i < question.length; i++) {
-        if (question[i] !== '') {
-          span = document.createElement('span');
-          span.textContent = question[i];
-          span.setAttribute('onclick', 'speakDataX(this)')
-          // span.setAttribute('onmousedown', 'speakData(this)')
-          div.appendChild(span);
-
-        }
-
-      }
-
-
-    }
+    
+    
     //
 
     function checkNext() {
@@ -852,8 +707,18 @@
           totalGrade.classList.add('totalGradeDisplay');
           totalGrade.classList.remove('totalGradeNoDisplay');
           let div = document.createElement('div');
-          div.textContent = `正答数は${seikaiSu}でした。`;
+          let mondaisu = questions.length - 1;
+          let ritsu = seikaiSu * 100 / mondaisu;
+          div.textContent = `正答数は${seikaiSu}, 正答率は${ritsu.toFixed(1)}でした。`;
           totalGrade.appendChild(div);
+
+          if (seikaiSu === mondaisu) {
+            div = document.createElement('div');
+            div.textContent = '恭喜恭喜!!';
+            div.setAttribute('id', 'baiFen');
+            totalGrade.appendChild(div);
+            speakData(div);
+          }
           div = document.createElement('div');
           div.setAttribute('id', 'reTry');
           div.setAttribute('onclick', 'setReTry()');
@@ -895,36 +760,53 @@
         const comment = document.getElementById('comment');
         const hanyuGroup = document.querySelectorAll('.hanyu');
         const pinyinGroup = document.querySelectorAll('.pinyin');
-        if (questions[cssIndex][0] !== 'E') {
+        if (questions[cssIndex][idxPattern] !== 'E') {
           hanyuGroup[cssIndex].classList.add('hanyuDisplay');
           hanyuGroup[cssIndex].classList.remove('hanyuNoDisplay');
         }
-        if (questions[cssIndex][0] !== 'D') {
+        if (questions[cssIndex][idxPattern] !== 'D') {
           pinyinGroup[cssIndex].classList.add('pinyinDisplay');
           pinyinGroup[cssIndex].classList.remove('pinyinNoDisplay');
 
         }
-        const hanyu = questions[cssIndex][1];
-        const pinyin = questions[cssIndex][2];
+        const hanyu = questions[cssIndex][idxHanyu];
+        const pinyin = questions[cssIndex][idxPinyin];
         console.log(hanyu);
         //
-        if (questions[cssIndex][0] !== 'A') {
+        if (questions[cssIndex][idxPattern] !== 'A') {
           const japaneseGroup = document.querySelectorAll('.japanese');
           japaneseGroup[cssIndex].classList.add('japaneseDisplay');
           japaneseGroup[cssIndex].classList.remove('japaneseNoDisplay');
 
         }
-        if (questions[cssIndex][0] === 'C') {
+        if (questions[cssIndex][idxPattern] === 'C' || questions[cssIndex][idxPattern] === 'F' || questions[cssIndex][idxPattern] === 'G') {
           const inputGroup = document.querySelectorAll('.input');
           let inputHanyu = inputGroup[cssIndex];
-          if (inputHanyu.value === hanyu) {
-            seikaiSu++;
-            comment.textContent = '好！赞👍';
+          //
+          if (questions[cssIndex][idxPattern] === 'F') {
+            if (pattertnF_Judge(inputHanyu.value, cssIndex)) {
+              seikaiSu++;
+              comment.textContent = '好！赞👍';
+            } else {
+              comment.textContent = '错×　再加油！！';
+  
+            }
+            speakData(comment);
+            
+
           } else {
-            comment.textContent = '错！　再加油！！';
+            if (inputHanyu.value === hanyu) {
+              seikaiSu++;
+              comment.textContent = '好！赞👍';
+            } else {
+              comment.textContent = '错×　再加油！！';
+  
+            }
+            speakData(comment);
 
           }
-          speakData(comment);
+
+          //
 
         } else {
           const answers = document.querySelectorAll('.answer');
@@ -939,7 +821,7 @@
           }
           console.log(answerString);
           let correctAnswer;
-          if (questions[cssIndex][0] === 'E') {
+          if (questions[cssIndex][idxPattern] === 'E') {
             correctAnswer = pinyin;
 
           } else {
@@ -952,7 +834,7 @@
             seikaiSu++;
             console.log('OK');
           } else {
-            comment.textContent = '错！　再加油！！';
+            comment.textContent = '错×　再加油！！';
             console.log('wrong');
           }
           speakData(comment);
@@ -960,6 +842,28 @@
         //
       }
 
+    }
+    // 
+    function  pattertnF_Judge(inputHanyu,  cssIndex) {
+      let matchOn = true;
+      let hanyu = questions[cssIndex][idxHanyu];
+      if (inputHanyu === hanyu) {
+        return matchOn;
+      }
+      matchOn = false;
+      for (let i = idxSpan; i < questions[cssIndex].length; i++)  {
+        if (questions[cssIndex][i] !== '') {
+          if (inputHanyu === questions[cssIndex][i]) {
+            matchOn = true;
+            return matchOn;
+  
+  
+          }
+
+        }
+      }
+      matchOn = false;
+      return matchOn;
     }
     //
     function setReTry() {
